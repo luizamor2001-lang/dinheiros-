@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dinheiros">
+<meta name="theme-color" content="#1B7A4A">
+<title>Dinheiros</title>
+
+<!-- PWA manifest inline via JS -->
+<script>
+const manifest = {
+  name: "Dinheiros",
+  short_name: "Dinheiros",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#F3F4F6",
+  theme_color: "#1B7A4A",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%231B7A4A'/><text y='130' x='96' text-anchor='middle' font-size='110' font-family='serif'>💚</text></svg>", sizes: "192x192", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = URL.createObjectURL(blob);
+document.head.appendChild(link);
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --verde: #1B7A4A;
+  --verde2: #52B788;
+  --verde-bg: #D8F3DC;
+  --azul: #2563EB;
+  --azul-bg: #DBEAFE;
+  --roxo: #7C3AED;
+  --roxo-bg: #EDE9FE;
+  --laranja: #EA580C;
+  --laranja-bg: #FFEDD5;
+  --rosa: #DB2777;
+  --rosa-bg: #FCE7F3;
+  --amarelo: #D97706;
+  --amarelo-bg: #FEF3C7;
+  --cinza: #6B7280;
+  --cinza2: #9CA3AF;
+  --fundo: #F3F4F6;
+  --branco: #FFFFFF;
+  --texto: #111827;
+  --borda: #E5E7EB;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1B7A4A 55%, #2563EB 100%);
+  padding: 44px 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background:rgba(255,255,255,0.06);
+}
+.header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+header h1 { font-family:'DM Serif Display',serif; color:#fff; font-size:28px; letter-spacing:0.5px; }
+.header-mes { font-size:12px; color:rgba(255,255,255,0.65); margin-top:3px; }
+
+.carteiras-header { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.carteira-pill {
+  background:rgba(255,255,255,0.13);
+  border-radius:14px; padding:10px 10px 8px;
+  border:1px solid rgba(255,255,255,0.18);
+}
+.carteira-pill .cp-label { font-size:10px; color:rgba(255,255,255,0.65); font-weight:600; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+.carteira-pill .cp-val { font-family:'DM Serif Display',serif; font-size:17px; color:#fff; line-height:1; }
+.carteira-pill .cp-emoji { font-size:13px; margin-bottom:4px; display:block; }
+
+/* TABS */
+.tabs {
+  display:flex; background:var(--branco);
+  border-bottom:1px solid var(--borda);
+  position:sticky; top:0; z-index:10; padding:0 8px;
+}
+.tab {
+  flex:1; text-align:center; padding:13px 4px 11px;
+  font-size:12px; font-weight:600; cursor:pointer;
+  color:var(--cinza); border:none; background:transparent;
+  font-family:'DM Sans',sans-serif;
+  border-bottom:2.5px solid transparent;
+  transition:all 0.15s; white-space:nowrap;
+}
+.tab.ativa { color:var(--verde); border-bottom-color:var(--verde); }
+
+/* CONTAINER */
+.container { max-width:480px; margin:0 auto; padding:0 14px; }
+
+/* CARD */
+.card {
+  background:var(--branco); border-radius:16px;
+  padding:16px; margin-bottom:10px;
+  border:1px solid var(--borda);
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.secao-titulo {
+  font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:1.3px; color:var(--cinza2); margin:20px 0 8px;
+}
+
+/* ITEM LINHA */
+.item-linha { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--fundo); }
+.item-linha:last-child { border-bottom:none; }
+.item-icone { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.item-info { flex:1; min-width:0; }
+.item-nome { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.item-sub { font-size:11px; color:var(--cinza); margin-top:1px; }
+.item-val { font-weight:600; font-size:15px; white-space:nowrap; }
+.val-verde { color:var(--verde); }
+.val-rosa { color:var(--rosa); }
+.val-laranja { color:var(--laranja); }
+.val-azul { color:var(--azul); }
+
+/* INPUTS */
+input[type="number"], input[type="text"] {
+  background:var(--fundo); border:1.5px solid var(--borda);
+  border-radius:10px; padding:9px 12px;
+  font-size:15px; font-family:'DM Sans',sans-serif;
+  color:var(--texto); width:100%; outline:none;
+  transition:border 0.2s;
+}
+input:focus { border-color:var(--verde2); }
+.pfx { position:relative; }
+.pfx span { position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--cinza); pointer-events:none; }
+.pfx input { padding-left:28px; }
+select {
+  background:var(--fundo); border:1.5px solid var(--borda);
+  border-radius:10px; padding:9px 10px;
+  font-size:14px; font-family:'DM Sans',sans-serif; color:var(--texto); outline:none;
+}
+
+/* BOTÕES */
+.btn {
+  border:none; border-radius:11px; padding:10px 16px;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:opacity 0.15s, transform 0.1s;
+  display:inline-flex; align-items:center; gap:5px;
+}
+.btn:active { transform:scale(0.97); }
+.btn-verde { background:var(--verde); color:#fff; }
+.btn-azul { background:var(--azul); color:#fff; }
+.btn-roxo { background:var(--roxo); color:#fff; }
+.btn-laranja { background:var(--laranja); color:#fff; }
+.btn-full { width:100%; justify-content:center; margin-top:10px; }
+.btn-sm { padding:8px 13px; font-size:13px; }
+.btn-outline { background:transparent; border:1.5px solid var(--borda); color:var(--cinza); }
+.btn-x { background:none; border:none; cursor:pointer; color:#D1D5DB; font-size:15px; padding:2px 4px; transition:color 0.15s; flex-shrink:0; }
+.btn-x:hover { color:var(--rosa); }
+.btn-check { background:var(--verde-bg); border:none; border-radius:7px; padding:3px 8px; font-size:11px; color:var(--verde); font-weight:700; cursor:pointer; flex-shrink:0; }
+
+/* FORMS */
+.form-row { display:flex; gap:8px; }
+.form-row > * { flex:1; }
+
+/* TOTAL BOX */
+.total-box { border-radius:14px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+.total-box .tb-label { font-size:13px; font-weight:600; }
+.total-box .tb-val { font-family:'DM Serif Display',serif; font-size:22px; }
+
+/* FATURA */
+.fatura-total {
+  background:linear-gradient(135deg, var(--roxo), #5B21B6);
+  border-radius:18px; padding:20px; color:#fff; margin-top:16px;
+}
+.fatura-total .ft-label { font-size:11px; text-transform:uppercase; letter-spacing:1.2px; opacity:0.75; margin-bottom:4px; }
+.fatura-total .ft-val { font-family:'DM Serif Display',serif; font-size:38px; line-height:1; }
+.fatura-total .ft-sub { font-size:12px; opacity:0.65; margin-top:6px; }
+
+/* FDS */
+.fds-hero {
+  background:linear-gradient(135deg, #F59E0B, #EA580C);
+  border-radius:20px; padding:22px; color:#fff; margin-top:16px;
+}
+.fds-hero .fh-label { font-size:11px; text-transform:uppercase; letter-spacing:1.2px; opacity:0.8; }
+.fds-hero .fh-val { font-family:'DM Serif Display',serif; font-size:46px; line-height:1; margin:4px 0; }
+.fds-hero .fh-sub { font-size:12px; opacity:0.75; }
+.barra { background:rgba(255,255,255,0.25); border-radius:100px; height:8px; margin:12px 0 6px; overflow:hidden; }
+.barra-fill { height:100%; border-radius:100px; background:rgba(255,255,255,0.85); transition:width 0.4s; }
+
+.fds-tabs { display:flex; gap:6px; margin:10px 0; }
+.fds-tab {
+  flex:1; padding:9px 6px; border-radius:11px;
+  border:1.5px solid var(--borda); background:var(--branco);
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600;
+  color:var(--cinza); cursor:pointer; text-align:center; transition:all 0.15s;
+}
+.fds-tab.ativo { background:var(--laranja); border-color:var(--laranja); color:#fff; }
+
+.semana-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.sem-box {
+  background:var(--branco); border-radius:12px; padding:12px;
+  border:1.5px solid var(--borda); text-align:center; cursor:pointer;
+  transition:border-color 0.15s;
+}
+.sem-box:hover { border-color:var(--laranja); }
+.sem-box.ativo { border-color:var(--laranja); background:var(--laranja-bg); }
+.sem-box .sb-num { font-size:10px; font-weight:700; color:var(--cinza2); text-transform:uppercase; letter-spacing:0.8px; }
+.sem-box .sb-gasto { font-family:'DM Serif Display',serif; font-size:19px; color:var(--laranja); margin:2px 0; }
+
+/* TRANSFERÊNCIA */
+.transf-row { display:flex; align-items:center; gap:8px; }
+.transf-arrow { font-size:20px; color:var(--cinza2); flex-shrink:0; }
+
+/* VAZIO */
+.vazio { font-size:13px; color:var(--cinza2); text-align:center; padding:12px 0; }
+
+/* ALERTA */
+.alerta { background:#FEF2F2; border:1.5px solid #FECACA; border-radius:11px; padding:10px 13px; font-size:13px; color:#991B1B; margin-top:10px; }
+
+/* RESUMO */
+.resumo-linha { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--borda); font-size:14px; }
+.resumo-linha:last-child { border-bottom:none; }
+
+/* INSTALAR BANNER */
+#install-banner {
+  background:linear-gradient(135deg,#1e3a5f,#1B7A4A);
+  color:#fff; padding:14px 16px; margin:14px 0 0;
+  border-radius:16px; display:none;
+  align-items:center; gap:12px;
+}
+#install-banner .ib-text { flex:1; font-size:13px; line-height:1.4; }
+#install-banner .ib-text strong { display:block; font-size:14px; margin-bottom:2px; }
+
+/* PÁGINA */
+.pagina { display:none; }
+.pagina.ativa { display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Dinheiros</h1>
+      <div class="header-mes" id="header-mes"></div>
+    </div>
+  </div>
+  <div class="carteiras-header">
+    <div class="carteira-pill">
+      <span class="cp-emoji">🏦</span>
+      <div class="cp-label">Corrente</div>
+      <div class="cp-val" id="disp-corrente">R$ 0</div>
+    </div>
+    <div class="carteira-pill">
+      <span class="cp-emoji">🐷</span>
+      <div class="cp-label">Poupança</div>
+      <div class="cp-val" id="disp-poupanca">R$ 0</div>
+    </div>
+    <div class="carteira-pill">
+      <span class="cp-emoji">💵</span>
+      <div class="cp-label">Físico</div>
+      <div class="cp-val" id="disp-fisico">R$ 0</div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab ativa" onclick="mudarPag('inicio',this)">Início</button>
+  <button class="tab" onclick="mudarPag('entradas',this)">Entradas</button>
+  <button class="tab" onclick="mudarPag('gastos',this)">Gastos</button>
+  <button class="tab" onclick="mudarPag('fds',this)">FDS</button>
+  <button class="tab" onclick="mudarPag('carteiras',this)">Carteiras</button>
+</div>
+
+<div class="container">
+
+<!-- ======= INÍCIO ======= -->
+<div class="pagina ativa" id="pag-inicio">
+
+  <div id="install-banner">
+    <span style="font-size:28px">📲</span>
+    <div class="ib-text">
+      <strong>Instalar no celular</strong>
+      Toque aqui para adicionar à tela inicial
+    </div>
+    <button id="install-btn" class="btn btn-sm" style="background:rgba(255,255,255,0.25);color:#fff;border:none;white-space:nowrap">Instalar</button>
+  </div>
+
+  <p class="secao-titulo">Resumo do mês</p>
+  <div class="card">
+    <div class="resumo-linha">
+      <span>🏦 Total nas carteiras</span>
+      <span class="val-verde" id="res-carteiras">R$ 0,00</span>
+    </div>
+    <div class="resumo-linha">
+      <span>📥 Entradas recebidas</span>
+      <span class="val-verde" id="res-rec">+ R$ 0,00</span>
+    </div>
+    <div class="resumo-linha">
+      <span style="color:var(--cinza2)">⏳ A receber (previsto)</span>
+      <span style="color:var(--amarelo)" id="res-prev">+ R$ 0,00</span>
+    </div>
+    <div class="resumo-linha">
+      <span>💳 Fatura crédito</span>
+      <span class="val-rosa" id="res-cred">− R$ 0,00</span>
+    </div>
+    <div class="resumo-linha">
+      <span>🎉 Orçamento FDS</span>
+      <span class="val-rosa" id="res-fds">− R$ 0,00</span>
+    </div>
+  </div>
+
+  <div class="total-box" style="background:var(--verde-bg)">
+    <span class="tb-label" style="color:var(--verde)">Saldo livre</span>
+    <span class="tb-val" style="color:var(--verde)" id="res-livre">R$ 0,00</span>
+  </div>
+  <div class="total-box" style="background:var(--amarelo-bg);margin-top:8px">
+    <span class="tb-label" style="color:var(--amarelo)">Com tudo previsto</span>
+    <span class="tb-val" style="color:var(--amarelo)" id="res-livre-prev">R$ 0,00</span>
+  </div>
+
+  <p class="secao-titulo">Últimas movimentações</p>
+  <div class="card">
+    <ul id="lista-movs"></ul>
+    <p class="vazio" id="movs-vazio">Nenhuma movimentação ainda</p>
+  </div>
+
+  <p class="secao-titulo">Mês</p>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:600;font-size:14px">Virada de mês</div>
+        <div style="font-size:12px;color:var(--cinza);margin-top:2px">Zera entradas, gastos e FDS.<br>Mantém saldos das carteiras.</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="viradaMes()">Novo mês</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= ENTRADAS ======= -->
+<div class="pagina" id="pag-entradas">
+
+  <p class="secao-titulo">Já recebido</p>
+  <div class="card" style="border-left:4px solid var(--verde2)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <div style="font-weight:600;font-size:14px">✅ Recebido</div>
+        <div style="font-size:11px;color:var(--cinza)">Entrou na conta corrente</div>
+      </div>
+      <span style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--verde)" id="total-rec">R$ 0,00</span>
+    </div>
+    <ul id="lista-rec"></ul>
+    <p class="vazio" id="rec-vazio">Nenhum ainda</p>
+    <div class="form-row" style="margin-top:10px">
+      <input type="text" id="inp-rec-nome" placeholder="Ex: Salário, cachê, workshop…" onkeydown="if(event.key==='Enter')addRec()" />
+      <div class="pfx" style="max-width:120px"><span>R$</span><input type="number" id="inp-rec-val" placeholder="0,00" step="0.01" onkeydown="if(event.key==='Enter')addRec()" /></div>
+      <button class="btn btn-verde btn-sm" onclick="addRec()">+</button>
+    </div>
+  </div>
+
+  <p class="secao-titulo">A receber</p>
+  <div class="card" style="border-left:4px solid var(--amarelo)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <div style="font-weight:600;font-size:14px">⏳ A receber</div>
+        <div style="font-size:11px;color:var(--cinza)">Combinado, ainda não caiu</div>
+      </div>
+      <span style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--amarelo)" id="total-prev">R$ 0,00</span>
+    </div>
+    <ul id="lista-prev"></ul>
+    <p class="vazio" id="prev-vazio">Nenhum ainda</p>
+    <div class="form-row" style="margin-top:10px">
+      <input type="text" id="inp-prev-nome" placeholder="Ex: Peça, freela, aula…" onkeydown="if(event.key==='Enter')addPrev()" />
+      <div class="pfx" style="max-width:120px"><span>R$</span><input type="number" id="inp-prev-val" placeholder="0,00" step="0.01" onkeydown="if(event.key==='Enter')addPrev()" /></div>
+      <button class="btn btn-sm" style="background:var(--amarelo);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;padding:8px 13px" onclick="addPrev()">+</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= GASTOS ======= -->
+<div class="pagina" id="pag-gastos">
+
+  <div class="fatura-total">
+    <div class="ft-label">Fatura do crédito</div>
+    <div class="ft-val" id="fatura-val">R$ 0,00</div>
+    <div class="ft-sub" id="fatura-sub">0 lançamentos</div>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;margin-top:14px" onclick="pagarFatura()">💳 Pagar fatura (débita da corrente)</button>
+  </div>
+
+  <p class="secao-titulo">Lançar no crédito</p>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <input type="text" id="inp-cred-nome" placeholder="Ex: Plano de saúde, celular, perfume…" />
+      <div class="form-row">
+        <div class="pfx"><span>R$</span><input type="number" id="inp-cred-val" placeholder="0,00" step="0.01" /></div>
+        <select id="inp-cred-tipo">
+          <option value="fixo">Gasto fixo</option>
+          <option value="extra">Extra / compra</option>
+        </select>
+      </div>
+      <button class="btn btn-roxo btn-full" onclick="addCred()" style="margin-top:0">+ Lançar no crédito</button>
+    </div>
+  </div>
+
+  <p class="secao-titulo">Lançamentos do crédito</p>
+  <div class="card">
+    <ul id="lista-cred"></ul>
+    <p class="vazio" id="cred-vazio">Nenhum lançamento ainda</p>
+  </div>
+
+  <p class="secao-titulo">Débito / Pix na corrente</p>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <input type="text" id="inp-deb-nome" placeholder="Ex: Mercado, farmácia…" />
+      <div class="pfx"><span>R$</span><input type="number" id="inp-deb-val" placeholder="0,00" step="0.01" /></div>
+      <button class="btn btn-azul btn-full" onclick="addDeb()" style="margin-top:0">− Lançar no débito</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= FDS ======= -->
+<div class="pagina" id="pag-fds">
+
+  <div class="fds-hero">
+    <div class="fh-label">Restante neste FDS</div>
+    <div class="fh-val" id="fds-rest">R$ 100</div>
+    <div class="barra"><div class="barra-fill" id="fds-barra" style="width:100%"></div></div>
+    <div class="fh-sub" id="fds-sub">Gasto: R$ 0,00 · Budget: R$ 100,00</div>
+    <div id="fds-alerta" class="alerta" style="display:none;margin-top:10px">⚠️ Quase no limite!</div>
+  </div>
+
+  <div class="fds-tabs" style="margin-top:14px">
+    <button class="fds-tab ativo" onclick="selFDS(0,this)">FDS 1</button>
+    <button class="fds-tab" onclick="selFDS(1,this)">FDS 2</button>
+    <button class="fds-tab" onclick="selFDS(2,this)">FDS 3</button>
+    <button class="fds-tab" onclick="selFDS(3,this)">FDS 4</button>
+  </div>
+
+  <p class="secao-titulo">Registrar gasto (débito)</p>
+  <div class="card">
+    <div class="form-row">
+      <input type="text" id="inp-fds-desc" placeholder="Ex: Hambúrguer, cinema…" onkeydown="if(event.key==='Enter')addFDS()" />
+      <div class="pfx" style="max-width:120px"><span>R$</span><input type="number" id="inp-fds-val" placeholder="0,00" step="0.01" onkeydown="if(event.key==='Enter')addFDS()" /></div>
+      <button class="btn btn-laranja btn-sm" onclick="addFDS()" style="border:none">−</button>
+    </div>
+  </div>
+
+  <p class="secao-titulo">Gastos deste FDS</p>
+  <div class="card">
+    <ul id="lista-fds"></ul>
+    <p class="vazio" id="fds-vazio">Nenhum gasto ainda 🎉</p>
+    <button id="btn-zerar" onclick="zerarFDS()" style="display:none;width:100%;margin-top:10px;padding:8px;background:none;border:1.5px solid var(--borda);border-radius:10px;font-size:12px;color:var(--cinza);cursor:pointer;font-family:'DM Sans',sans-serif">Zerar este FDS</button>
+  </div>
+
+  <p class="secao-titulo">Visão geral do mês</p>
+  <div class="semana-grid" id="semana-grid"></div>
+
+  <p class="secao-titulo">Configurar</p>
+  <div class="card">
+    <div style="font-size:12px;color:var(--cinza);margin-bottom:8px">Budget por final de semana</div>
+    <div class="pfx"><span>R$</span><input type="number" id="inp-fds-budget" value="100" step="0.01" oninput="salvar()" /></div>
+  </div>
+
+</div>
+
+<!-- ======= CARTEIRAS ======= -->
+<div class="pagina" id="pag-carteiras">
+
+  <p class="secao-titulo">Saldos atuais</p>
+  <div class="card">
+    <div class="item-linha">
+      <div class="item-icone" style="background:var(--azul-bg)">🏦</div>
+      <div class="item-info"><div class="item-nome">Conta corrente</div><div class="item-sub">Banco do Brasil</div></div>
+      <div class="pfx" style="width:130px"><span>R$</span><input type="number" id="inp-corrente" placeholder="0,00" step="0.01" oninput="salvar()" /></div>
+    </div>
+    <div class="item-linha">
+      <div class="item-icone" style="background:var(--verde-bg)">🐷</div>
+      <div class="item-info"><div class="item-nome">Poupança</div><div class="item-sub">Banco do Brasil</div></div>
+      <div class="pfx" style="width:130px"><span>R$</span><input type="number" id="inp-poupanca" placeholder="0,00" step="0.01" oninput="salvar()" /></div>
+    </div>
+    <div class="item-linha">
+      <div class="item-icone" style="background:var(--amarelo-bg)">💵</div>
+      <div class="item-info"><div class="item-nome">Dinheiro físico</div><div class="item-sub">Na carteira</div></div>
+      <div class="pfx" style="width:130px"><span>R$</span><input type="number" id="inp-fisico" placeholder="0,00" step="0.01" oninput="salvar()" /></div>
+    </div>
+  </div>
+
+  <p class="secao-titulo">Transferência</p>
+  <div class="card">
+    <div class="transf-row">
+      <select id="tr-orig" style="flex:1">
+        <option value="corrente">Corrente</option>
+        <option value="poupanca">Poupança</option>
+        <option value="fisico">Físico</option>
+      </select>
+      <div class="transf-arrow">→</div>
+      <select id="tr-dest" style="flex:1">
+        <option value="poupanca">Poupança</option>
+        <option value="corrente">Corrente</option>
+        <option value="fisico">Físico</option>
+      </select>
+    </div>
+    <div class="pfx" style="margin-top:8px"><span>R$</span><input type="number" id="inp-tr-val" placeholder="0,00" step="0.01" /></div>
+    <button class="btn btn-verde btn-full" onclick="transferir()">Transferir</button>
+  </div>
+
+  <p class="secao-titulo">Dinheiro físico</p>
+  <div class="card">
+    <div style="font-size:12px;color:var(--cinza);margin-bottom:8px">Atualizar valor em espécie</div>
+    <div class="pfx"><span>R$</span><input type="number" id="inp-fisico2" placeholder="Novo valor…" step="0.01" /></div>
+    <button class="btn btn-outline btn-full" onclick="ajustarFisico()">Atualizar físico</button>
+  </div>
+
+</div>
+
+</div><!-- /container -->
+
+<script>
+// =====================
+// ESTADO
+// =====================
+const CHAVE = 'dinheiros-v3';
+
+let E = {
+  corrente: 0,
+  poupanca: 0,
+  fisico: 0,
+  entRec: [],    // {nome, val}
+  entPrev: [],   // {nome, val}
+  creditos: [],  // {nome, val, tipo}
+  fdsBudget: 100,
+  fdsItens: [[], [], [], []],
+  fdsIdx: 0,
+  movs: []       // {tipo, desc, val, cart}
+};
+
+let fdsIdx = 0;
+
+// =====================
+// PERSISTÊNCIA ROBUSTA
+// =====================
+function salvar() {
+  lerInputs();
+  calcular();
+  const json = JSON.stringify(E);
+  // Tenta todas as formas de salvar
+  try { localStorage.setItem(CHAVE, json); } catch(e) {}
+  try { sessionStorage.setItem(CHAVE, json); } catch(e) {}
+  try { document.cookie = CHAVE + '=' + encodeURIComponent(json.substring(0, 3900)) + ';max-age=31536000;path=/'; } catch(e) {}
+  try { if (window.indexedDB) salvarIDB(json); } catch(e) {}
+}
+
+function salvarIDB(json) {
+  const req = indexedDB.open('dinheiros', 1);
+  req.onupgradeneeded = e => e.target.result.createObjectStore('dados');
+  req.onsuccess = e => {
+    const tx = e.target.result.transaction('dados', 'readwrite');
+    tx.objectStore('dados').put(json, 'estado');
+  };
+}
+
+function carregarIDB(cb) {
+  try {
+    const req = indexedDB.open('dinheiros', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('dados');
+    req.onsuccess = e => {
+      const tx = e.target.result.transaction('dados', 'readonly');
+      const get = tx.objectStore('dados').get('estado');
+      get.onsuccess = () => cb(get.result || null);
+      get.onerror = () => cb(null);
+    };
+    req.onerror = () => cb(null);
+  } catch(e) { cb(null); }
+}
+
+function carregar() {
+  // Tenta localStorage primeiro
+  let json = null;
+  try { json = localStorage.getItem(CHAVE); } catch(e) {}
+  if (!json) { try { json = sessionStorage.getItem(CHAVE); } catch(e) {} }
+
+  if (json) {
+    aplicarJSON(json);
+    init();
+  } else {
+    // Tenta IndexedDB
+    carregarIDB(j => {
+      if (j) aplicarJSON(j);
+      init();
+    });
+  }
+}
+
+function aplicarJSON(json) {
+  try {
+    const parsed = JSON.parse(json);
+    E = { ...E, ...parsed };
+  } catch(e) {}
+  // Garantir estruturas
+  if (!Array.isArray(E.fdsItens) || E.fdsItens.length !== 4) E.fdsItens = [[],[],[],[]];
+  E.fdsItens = E.fdsItens.map(a => Array.isArray(a) ? a : []);
+  if (!Array.isArray(E.entRec)) E.entRec = [];
+  if (!Array.isArray(E.entPrev)) E.entPrev = [];
+  if (!Array.isArray(E.creditos)) E.creditos = [];
+  if (!Array.isArray(E.movs)) E.movs = [];
+}
+
+function lerInputs() {
+  E.corrente = pf('inp-corrente');
+  E.poupanca = pf('inp-poupanca');
+  E.fisico = pf('inp-fisico');
+  E.fdsBudget = pf('inp-fds-budget') || 100;
+}
+
+function preencherInputs() {
+  sv('inp-corrente', E.corrente || '');
+  sv('inp-poupanca', E.poupanca || '');
+  sv('inp-fisico', E.fisico || '');
+  sv('inp-fds-budget', E.fdsBudget || 100);
+}
+
+// =====================
+// CÁLCULO
+// =====================
+function calcular() {
+  const totalCart = E.corrente + E.poupanca + E.fisico;
+  const totalRec  = E.entRec.reduce((a,x) => a+x.val, 0);
+  const totalPrev = E.entPrev.reduce((a,x) => a+x.val, 0);
+  const totalCred = E.creditos.reduce((a,x) => a+x.val, 0);
+  const fdsTot    = (E.fdsBudget||100) * 4;
+  const livre     = totalCart + totalRec - totalCred - fdsTot;
+  const livrePrev = livre + totalPrev;
+
+  // Header
+  R('disp-corrente', fmtK(E.corrente));
+  R('disp-poupanca', fmtK(E.poupanca));
+  R('disp-fisico',   fmtK(E.fisico));
+
+  // Início
+  R('res-carteiras', fmt(totalCart));
+  R('res-rec',  '+ ' + fmt(totalRec));
+  R('res-prev', '+ ' + fmt(totalPrev));
+  R('res-cred', '− ' + fmt(totalCred));
+  R('res-fds',  '− ' + fmt(fdsTot));
+  R('res-livre', fmt(livre));
+  R('res-livre-prev', fmt(livrePrev));
+
+  // Entradas totais
+  R('total-rec',  fmt(totalRec));
+  R('total-prev', fmt(totalPrev));
+
+  // Fatura
+  R('fatura-val', fmt(totalCred));
+  R('fatura-sub', E.creditos.length + ' lançamento' + (E.creditos.length !== 1 ? 's' : ''));
+
+  // FDS
+  atualizarFDSHero();
+}
+
+// =====================
+// ENTRADAS
+// =====================
+function addRec() {
+  const nome = gv('inp-rec-nome').trim();
+  const val = pf('inp-rec-val');
+  if (!nome || !val) return;
+  E.entRec.push({ nome, val });
+  E.corrente += val;
+  addMov('entrada', nome, val, 'corrente');
+  sv('inp-rec-nome',''); sv('inp-rec-val','');
+  renderEntradas();
+  salvar();
+}
+
+function addPrev() {
+  const nome = gv('inp-prev-nome').trim();
+  const val = pf('inp-prev-val');
+  if (!nome || !val) return;
+  E.entPrev.push({ nome, val });
+  sv('inp-prev-nome',''); sv('inp-prev-val','');
+  renderEntradas();
+  salvar();
+}
+
+function marcarRec(i) {
+  const item = E.entPrev.splice(i, 1)[0];
+  E.entRec.push(item);
+  E.corrente += item.val;
+  addMov('entrada', item.nome, item.val, 'corrente');
+  renderEntradas();
+  salvar();
+}
+
+function remRec(i)  { E.entRec.splice(i,1);  renderEntradas(); salvar(); }
+function remPrev(i) { E.entPrev.splice(i,1); renderEntradas(); salvar(); }
+
+function renderEntradas() {
+  renderLista('lista-rec', 'rec-vazio', E.entRec, (e,i) => `
+    <div class="item-icone" style="background:var(--verde-bg)">💰</div>
+    <div class="item-info"><div class="item-nome">${e.nome}</div></div>
+    <span class="val-verde">${fmt(e.val)}</span>
+    <button class="btn-x" onclick="remRec(${i})">✕</button>`);
+
+  renderLista('lista-prev', 'prev-vazio', E.entPrev, (e,i) => `
+    <div class="item-icone" style="background:var(--amarelo-bg)">⏳</div>
+    <div class="item-info"><div class="item-nome" style="font-style:italic">${e.nome}</div></div>
+    <span style="color:var(--amarelo);font-weight:600">${fmt(e.val)}</span>
+    <button class="btn-check" onclick="marcarRec(${i})" title="Marcar como recebido">✓</button>
+    <button class="btn-x" onclick="remPrev(${i})">✕</button>`);
+  calcular();
+}
+
+// =====================
+// GASTOS — CRÉDITO
+// =====================
+function addCred() {
+  const nome = gv('inp-cred-nome').trim();
+  const val  = pf('inp-cred-val');
+  const tipo = gv('inp-cred-tipo');
+  if (!nome || !val) return;
+  E.creditos.push({ nome, val, tipo });
+  addMov('credito', nome, val, 'credito');
+  sv('inp-cred-nome',''); sv('inp-cred-val','');
+  renderGastos();
+  salvar();
+}
+
+function remCred(i) { E.creditos.splice(i,1); renderGastos(); salvar(); }
+
+function pagarFatura() {
+  const total = E.creditos.reduce((a,x) => a+x.val, 0);
+  if (!total) { alert('Nenhum lançamento na fatura.'); return; }
+  if (!confirm('Pagar ' + fmt(total) + ' debitando da conta corrente?')) return;
+  E.corrente -= total;
+  addMov('saida', 'Pagamento da fatura', total, 'corrente');
+  E.creditos = [];
+  renderGastos();
+  salvar();
+}
+
+function addDeb() {
+  const nome = gv('inp-deb-nome').trim();
+  const val  = pf('inp-deb-val');
+  if (!nome || !val) return;
+  E.corrente -= val;
+  addMov('saida', nome, val, 'corrente');
+  sv('inp-deb-nome',''); sv('inp-deb-val','');
+  salvar();
+}
+
+function renderGastos() {
+  renderLista('lista-cred', 'cred-vazio', E.creditos, (c,i) => `
+    <div class="item-icone" style="background:var(--roxo-bg)">💳</div>
+    <div class="item-info">
+      <div class="item-nome">${c.nome}</div>
+      <div class="item-sub">${c.tipo === 'fixo' ? 'Fixo' : 'Extra'}</div>
+    </div>
+    <span class="val-rosa">${fmt(c.val)}</span>
+    <button class="btn-x" onclick="remCred(${i})">✕</button>`);
+  calcular();
+}
+
+// =====================
+// FDS
+// =====================
+function selFDS(i, btn) {
+  fdsIdx = i; E.fdsIdx = i;
+  document.querySelectorAll('.fds-tab').forEach((b,bi) => b.classList.toggle('ativo', bi===i));
+  document.querySelectorAll('.sem-box').forEach((b,bi) => b.classList.toggle('ativo', bi===i));
+  atualizarFDSHero();
+  renderFDSItens();
+}
+
+function addFDS() {
+  const desc = gv('inp-fds-desc').trim() || 'Gasto';
+  const val  = pf('inp-fds-val');
+  if (!val) return;
+  E.fdsItens[fdsIdx].push({ desc, val });
+  E.corrente -= val;
+  addMov('saida', desc + ' (FDS ' + (fdsIdx+1) + ')', val, 'corrente');
+  sv('inp-fds-desc',''); sv('inp-fds-val','');
+  document.getElementById('inp-fds-desc').focus();
+  atualizarFDSHero();
+  renderFDSItens();
+  renderSemanas();
+  salvar();
+}
+
+function remFDSItem(i) {
+  const item = E.fdsItens[fdsIdx].splice(i,1)[0];
+  E.corrente += item.val;
+  atualizarFDSHero();
+  renderFDSItens();
+  renderSemanas();
+  salvar();
+}
+
+function zerarFDS() {
+  if (!confirm('Zerar FDS ' + (fdsIdx+1) + '?')) return;
+  const tot = E.fdsItens[fdsIdx].reduce((a,x) => a+x.val, 0);
+  E.corrente += tot;
+  E.fdsItens[fdsIdx] = [];
+  atualizarFDSHero();
+  renderFDSItens();
+  renderSemanas();
+  salvar();
+}
+
+function atualizarFDSHero() {
+  const itens  = E.fdsItens[fdsIdx] || [];
+  const gasto  = itens.reduce((a,x) => a+x.val, 0);
+  const budget = E.fdsBudget || 100;
+  const rest   = budget - gasto;
+  const pct    = Math.max(0, Math.min(100, (rest/budget)*100));
+  R('fds-rest', fmt(rest));
+  R('fds-sub', 'Gasto: ' + fmt(gasto) + ' · Budget: ' + fmt(budget));
+  const fill = document.getElementById('fds-barra');
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.style.background = pct < 20 ? 'rgba(239,68,68,0.9)' : 'rgba(255,255,255,0.85)';
+  }
+  const al = document.getElementById('fds-alerta');
+  if (al) al.style.display = (pct < 20 && rest >= 0) ? 'block' : 'none';
+}
+
+function renderFDSItens() {
+  const itens = E.fdsItens[fdsIdx] || [];
+  renderLista('lista-fds', 'fds-vazio', itens, (it,i) => `
+    <div class="item-icone" style="background:var(--laranja-bg)">🎉</div>
+    <div class="item-info"><div class="item-nome">${it.desc}</div></div>
+    <span style="color:var(--laranja);font-weight:600">${fmt(it.val)}</span>
+    <button class="btn-x" onclick="remFDSItem(${i})">✕</button>`);
+  const btn = document.getElementById('btn-zerar');
+  if (btn) btn.style.display = itens.length ? 'block' : 'none';
+}
+
+function renderSemanas() {
+  const g = document.getElementById('semana-grid');
+  if (!g) return;
+  const b = E.fdsBudget || 100;
+  g.innerHTML = '';
+  E.fdsItens.forEach((itens, i) => {
+    const gasto = itens.reduce((a,x) => a+x.val, 0);
+    const rest  = b - gasto;
+    const div = document.createElement('div');
+    div.className = 'sem-box' + (i===fdsIdx?' ativo':'');
+    div.onclick = () => {
+      fdsIdx = i; E.fdsIdx = i;
+      document.querySelectorAll('.fds-tab').forEach((b,bi) => b.classList.toggle('ativo', bi===i));
+      atualizarFDSHero(); renderFDSItens(); renderSemanas();
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+    div.innerHTML = `<div class="sb-num">FDS ${i+1}</div>
+      <div class="sb-gasto">${fmt(gasto)}</div>
+      <div style="font-size:11px;color:${rest<0?'var(--rosa)':'var(--cinza)'}">${rest>=0?'sobra':'estouro'} <strong>${fmt(Math.abs(rest))}</strong></div>`;
+    g.appendChild(div);
+  });
+}
+
+// =====================
+// CARTEIRAS
+// =====================
+function transferir() {
+  const orig = gv('tr-orig');
+  const dest = gv('tr-dest');
+  const val  = pf('inp-tr-val');
+  if (!val) return;
+  if (orig === dest) { alert('Origem e destino iguais.'); return; }
+  E[orig] -= val;
+  E[dest] += val;
+  addMov('transf', nCart(orig) + ' → ' + nCart(dest), val, orig);
+  sv('inp-tr-val','');
+  preencherInputs();
+  salvar();
+}
+
+function ajustarFisico() {
+  const val = pf('inp-fisico2');
+  if (!val && gv('inp-fisico2') === '') return;
+  E.fisico = val;
+  sv('inp-fisico', val || '');
+  sv('inp-fisico2','');
+  addMov('ajuste', 'Ajuste físico', val, 'fisico');
+  salvar();
+}
+
+function nCart(k) { return k==='corrente'?'Corrente':k==='poupanca'?'Poupança':'Físico'; }
+
+// =====================
+// MOVIMENTAÇÕES
+// =====================
+function addMov(tipo, desc, val, cart) {
+  E.movs.unshift({ tipo, desc, val, cart });
+  if (E.movs.length > 30) E.movs = E.movs.slice(0,30);
+}
+
+function renderMovs() {
+  const ul = document.getElementById('lista-movs');
+  const vz = document.getElementById('movs-vazio');
+  if (!ul) return;
+  ul.innerHTML = '';
+  if (!E.movs.length) { vz.style.display='block'; return; }
+  vz.style.display='none';
+  E.movs.slice(0,10).forEach(m => {
+    const li = document.createElement('li');
+    li.className = 'item-linha';
+    const emoji = m.tipo==='entrada'?'📥':m.tipo==='credito'?'💳':m.tipo==='transf'?'🔄':'📤';
+    const cor   = m.tipo==='entrada'?'val-verde':'val-rosa';
+    const sinal = m.tipo==='entrada'?'+':'−';
+    li.innerHTML = `
+      <div class="item-icone" style="background:var(--fundo)">${emoji}</div>
+      <div class="item-info"><div class="item-nome">${m.desc}</div><div class="item-sub">${nCart(m.cart||'corrente')}</div></div>
+      <span class="${cor}">${sinal} ${fmt(m.val)}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+// =====================
+// VIRADA DE MÊS
+// =====================
+function viradaMes() {
+  if (!confirm('Iniciar novo mês?\n\nEntradas, gastos e FDS serão zerados.\nOs saldos das carteiras continuam.')) return;
+  E.entRec   = [];
+  E.entPrev  = [];
+  E.creditos = [];
+  E.fdsItens = [[],[],[],[]];
+  E.movs     = [];
+  fdsIdx = 0; E.fdsIdx = 0;
+  document.querySelectorAll('.fds-tab').forEach((b,i) => b.classList.toggle('ativo', i===0));
+  renderTudo();
+  salvar();
+  mudarPag('inicio', document.querySelector('.tab'));
+}
+
+// =====================
+// RENDER GERAL
+// =====================
+function renderTudo() {
+  renderEntradas();
+  renderGastos();
+  renderFDSItens();
+  renderSemanas();
+  renderMovs();
+}
+
+function renderLista(ulId, vzId, arr, tpl) {
+  const ul = document.getElementById(ulId);
+  const vz = document.getElementById(vzId);
+  if (!ul) return;
+  ul.innerHTML = '';
+  if (!arr || !arr.length) { if (vz) vz.style.display='block'; return; }
+  if (vz) vz.style.display='none';
+  arr.forEach((item,i) => {
+    const li = document.createElement('li');
+    li.className = 'item-linha';
+    li.innerHTML = tpl(item, i);
+    ul.appendChild(li);
+  });
+}
+
+// =====================
+// NAVEGAÇÃO
+// =====================
+function mudarPag(pg, btn) {
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativa'));
+  document.getElementById('pag-'+pg).classList.add('ativa');
+  if (btn) btn.classList.add('ativa');
+}
+
+// =====================
+// PWA — INSTALAR
+// =====================
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.style.display = 'flex';
+});
+
+document.getElementById('install-btn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  if (outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.style.display = 'none';
+});
+
+// =====================
+// HELPERS
+// =====================
+function fmt(v) { return 'R$ ' + (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtK(v) {
+  v = v||0;
+  if (Math.abs(v)>=1000) return 'R$' + (v/1000).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'k';
+  return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function R(id,t)  { const el=document.getElementById(id); if(el) el.textContent=t; }
+function pf(id)   { return parseFloat(document.getElementById(id)?.value)||0; }
+function gv(id)   { return document.getElementById(id)?.value||''; }
+function sv(id,v) { const el=document.getElementById(id); if(el) el.value=v; }
+
+// Mês
+function setMes() {
+  const m=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const d=new Date();
+  R('header-mes', m[d.getMonth()]+' '+d.getFullYear());
+}
+
+// =====================
+// INIT
+// =====================
+function init() {
+  fdsIdx = E.fdsIdx || 0;
+  preencherInputs();
+  renderTudo();
+  calcular();
+  // Destacar tab FDS ativo
+  document.querySelectorAll('.fds-tab').forEach((b,i) => b.classList.toggle('ativo', i===fdsIdx));
+}
+
+setMes();
+carregar();
+
+// Service Worker para funcionar offline
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'dinheiros-v1';
+    const URLS = [self.location.href];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS)));
+      self.skipWaiting();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl  = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
+</body>
+</html>
